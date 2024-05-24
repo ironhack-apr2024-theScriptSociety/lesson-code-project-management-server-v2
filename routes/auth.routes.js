@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const { isAuthenticated } = require("../middleware/jwt.middleware");
+
 const User = require("../models/User.model");
 
 const router = express.Router();
@@ -79,7 +81,6 @@ router.post('/signup', (req, res, next) => {
 
 
 
-
 // POST  /auth/login - Verifies email and password and returns a JWT
 router.post('/login', (req, res, next) => {
   const { email, password } = req.body;
@@ -128,6 +129,18 @@ router.post('/login', (req, res, next) => {
     .catch(err => res.status(500).json({ message: "Internal Server Error" }));
 });
 
+
+// GET  /auth/verify  -  Used to verify JWT stored on the client
+router.get('/verify', isAuthenticated, (req, res, next) => {       // <== CREATE NEW ROUTE
+ 
+  // If JWT token is valid the payload gets decoded by the
+  // isAuthenticated middleware and made available on `req.payload`
+  console.log(`req.payload`, req.payload);
+ 
+  // Send back the object with user data
+  // previously set as the token payload
+  res.json(req.payload);
+});
 
 
 
